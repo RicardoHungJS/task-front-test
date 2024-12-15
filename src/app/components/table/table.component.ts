@@ -1,40 +1,184 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { Component, inject, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { DinamicFormFieldComponent } from '../dinamic-form-field/dinamic-form-field.component';
 
-type Element = {
-  position: number;
-  name: string;
-  weight: number;
-  symbol: string;
+type Task = {
+  title: string;
+  status: string;
+  priority: string;
+  dueDate: string;
+  tags: string[];
 };
 
-const ELEMENT_DATA: Element[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-  { position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-  { position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-  { position: 5, name: 'Boron', weight: 10.811, symbol: 'B' },
-  { position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C' },
-  { position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N' },
-  { position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O' },
-  { position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F' },
-  { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' },
+const TASK_DATA: Task[] = [
+  {
+    title: 'Fix API bug',
+    status: 'In Progress',
+    priority: 'Low',
+    dueDate: '2024-12-20',
+    tags: ['backend', 'bug'],
+  },
+  {
+    title: 'Redesign homepage',
+    status: 'Pending',
+    priority: 'Medium',
+    dueDate: '2024-12-25',
+    tags: ['frontend', 'UI'],
+  },
+  {
+    title: 'Write unit tests',
+    status: 'Completed',
+    priority: 'High',
+    dueDate: '2024-12-10',
+    tags: ['testing'],
+  },
+  {
+    title: 'Set up CI/CD',
+    status: 'Pending',
+    priority: 'Low',
+    dueDate: '2024-12-30',
+    tags: ['devops'],
+  },
+  {
+    title: 'Optimize database queries',
+    status: 'In Progress',
+    priority: 'Medium',
+    dueDate: '2024-12-22',
+    tags: ['backend', 'performance'],
+  },
+  {
+    title: 'Prepare sprint demo',
+    status: 'Pending',
+    priority: 'High',
+    dueDate: '2024-12-28',
+    tags: ['team'],
+  },
+  {
+    title: 'Fix CSS inconsistencies',
+    status: 'Pending',
+    priority: 'Low',
+    dueDate: '2024-12-18',
+    tags: ['frontend', 'UI'],
+  },
+  {
+    title: 'Refactor login flow',
+    status: 'In Progress',
+    priority: 'Medium',
+    dueDate: '2024-12-19',
+    tags: ['authentication', 'frontend'],
+  },
+  {
+    title: 'Document API endpoints',
+    status: 'Completed',
+    priority: 'High',
+    dueDate: '2024-12-08',
+    tags: ['documentation'],
+  },
+  {
+    title: 'Update dependencies',
+    status: 'Pending',
+    priority: 'Low',
+    dueDate: '2024-12-15',
+    tags: ['maintenance'],
+  },
+  {
+    title: 'Create error handling module',
+    status: 'In Progress',
+    priority: 'Medium',
+    dueDate: '2024-12-21',
+    tags: ['backend', 'error-handling'],
+  },
+  {
+    title: 'Design onboarding flow',
+    status: 'Pending',
+    priority: 'High',
+    dueDate: '2024-12-24',
+    tags: ['UI', 'UX'],
+  },
+  {
+    title: 'Conduct code review',
+    status: 'Completed',
+    priority: 'Low',
+    dueDate: '2024-12-05',
+    tags: ['team'],
+  },
+  {
+    title: 'Set up analytics tracking',
+    status: 'In Progress',
+    priority: 'Medium',
+    dueDate: '2024-12-27',
+    tags: ['analytics', 'backend'],
+  },
+  {
+    title: 'Research AI tools',
+    status: 'Pending',
+    priority: 'High',
+    dueDate: '2024-12-29',
+    tags: ['research'],
+  },
+  {
+    title: 'Fix 404 errors',
+    status: 'Completed',
+    priority: 'Low',
+    dueDate: '2024-12-13',
+    tags: ['bug', 'frontend'],
+  },
+  {
+    title: 'Improve SEO',
+    status: 'In Progress',
+    priority: 'Medium',
+    dueDate: '2024-12-26',
+    tags: ['SEO', 'frontend'],
+  },
+  {
+    title: 'Deploy staging server',
+    status: 'Pending',
+    priority: 'High',
+    dueDate: '2024-12-23',
+    tags: ['devops', 'staging'],
+  },
+  {
+    title: 'Organize team retrospective',
+    status: 'Completed',
+    priority: 'Low',
+    dueDate: '2024-12-11',
+    tags: ['team', 'management'],
+  },
+  {
+    title: 'Implement dark mode',
+    status: 'In Progress',
+    priority: 'Medium',
+    dueDate: '2024-12-17',
+    tags: ['frontend', 'UI'],
+  },
 ];
 
 @Component({
   selector: 'app-table',
-  imports: [MatTableModule, MatSortModule, MatPaginatorModule],
+  imports: [
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    DinamicFormFieldComponent,
+  ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
 export class TableComponent {
   private _liveAnnouncer = inject(LiveAnnouncer);
 
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
-  dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
+  displayedColumns: string[] = [
+    'title',
+    'status',
+    'priority',
+    'dueDate',
+    'tags',
+    'actions',
+  ];
+  dataSource = new MatTableDataSource<Task>(TASK_DATA);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -44,12 +188,30 @@ export class TableComponent {
     this.dataSource.sort = this.sort;
   }
 
-  /** Announce the change in sort state for assistive technology. */
-  announceSortChange(sortState: Sort) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+  applyFilterForTitle(event: string) {
+    this.dataSource.filterPredicate = (data, filter) => {
+      return data.title.toLowerCase().includes(filter);
+    };
+
+    this.dataSource.filter = event.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  applyFilterForStatusAndPriority(event: string) {
+    this.dataSource.filterPredicate = (data, filter) => {
+      return (
+        data.status.toLowerCase().includes(filter) ||
+        data.priority.toLowerCase().includes(filter)
+      );
+    };
+
+    this.dataSource.filter = event.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
     }
   }
 }
