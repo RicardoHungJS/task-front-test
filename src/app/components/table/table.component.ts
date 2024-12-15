@@ -1,5 +1,6 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -163,12 +164,15 @@ const TASK_DATA: Task[] = [
     MatSortModule,
     MatPaginatorModule,
     DinamicFormFieldComponent,
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
 export class TableComponent {
-  private _liveAnnouncer = inject(LiveAnnouncer);
+  titleFilter: string = '';
+  statusPriorityFilter: string = '';
 
   displayedColumns: string[] = [
     'title',
@@ -188,13 +192,23 @@ export class TableComponent {
     this.dataSource.sort = this.sort;
   }
 
+  handleInputEvent(field: 'statusPriority' | 'title', value: string) {
+    if (field === 'statusPriority') {
+      this.statusPriorityFilter = value;
+      this.titleFilter = '';
+      this.applyFilterForStatusAndPriority(value);
+    } else if (field === 'title') {
+      this.titleFilter = value;
+      this.statusPriorityFilter = '';
+      this.applyFilterForTitle(value);
+    }
+  }
+
   applyFilterForTitle(event: string) {
     this.dataSource.filterPredicate = (data, filter) => {
       return data.title.toLowerCase().includes(filter);
     };
-
     this.dataSource.filter = event.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -207,11 +221,23 @@ export class TableComponent {
         data.priority.toLowerCase().includes(filter)
       );
     };
-
     this.dataSource.filter = event.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  ResetSearchFields() {
+    this.titleFilter = '';
+    this.statusPriorityFilter = '';
+    this.dataSource.filter = '';
+  }
+
+  editTask(task: Task) {
+    console.log(task);
+  }
+
+  deleteTask(task: Task) {
+    console.log(task);
   }
 }

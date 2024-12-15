@@ -12,10 +12,10 @@ export class DinamicFormFieldComponent {
   @Output() inputEvent = new EventEmitter<string>();
   @Input() placeholder: string = '';
   @Input() label: string = '';
+  @Input() value: string = '';
 
   onEvent(event: any) {
     const filterValue = (event.target as HTMLInputElement).value;
-
     this.inputEvent.emit(filterValue);
   }
 }
