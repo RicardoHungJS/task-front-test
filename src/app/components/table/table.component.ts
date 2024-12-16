@@ -1,178 +1,54 @@
-import { Component, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DinamicFormFieldComponent } from '../dinamic-form-field/dinamic-form-field.component';
+import { GeneralModalComponent } from '../general-modal/general-modal.component';
+import { TasksGeneralFormComponent } from '../tasks-general-form/tasks-general-form.component';
+import { Task } from '../../models/taskModel';
+import { TasksService } from '../../services/tasks.service';
+import { CommonModule } from '@angular/common';
+import { ConfirmComponent } from '../confirm/confirm.component';
 
-type Task = {
-  title: string;
-  status: string;
-  priority: string;
-  dueDate: string;
-  tags: string[];
-};
-
-const TASK_DATA: Task[] = [
-  {
-    title: 'Fix API bug',
-    status: 'In Progress',
-    priority: 'Low',
-    dueDate: '2024-12-20',
-    tags: ['backend', 'bug'],
-  },
-  {
-    title: 'Redesign homepage',
-    status: 'Pending',
-    priority: 'Medium',
-    dueDate: '2024-12-25',
-    tags: ['frontend', 'UI'],
-  },
-  {
-    title: 'Write unit tests',
-    status: 'Completed',
-    priority: 'High',
-    dueDate: '2024-12-10',
-    tags: ['testing'],
-  },
-  {
-    title: 'Set up CI/CD',
-    status: 'Pending',
-    priority: 'Low',
-    dueDate: '2024-12-30',
-    tags: ['devops'],
-  },
-  {
-    title: 'Optimize database queries',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: '2024-12-22',
-    tags: ['backend', 'performance'],
-  },
-  {
-    title: 'Prepare sprint demo',
-    status: 'Pending',
-    priority: 'High',
-    dueDate: '2024-12-28',
-    tags: ['team'],
-  },
-  {
-    title: 'Fix CSS inconsistencies',
-    status: 'Pending',
-    priority: 'Low',
-    dueDate: '2024-12-18',
-    tags: ['frontend', 'UI'],
-  },
-  {
-    title: 'Refactor login flow',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: '2024-12-19',
-    tags: ['authentication', 'frontend'],
-  },
-  {
-    title: 'Document API endpoints',
-    status: 'Completed',
-    priority: 'High',
-    dueDate: '2024-12-08',
-    tags: ['documentation'],
-  },
-  {
-    title: 'Update dependencies',
-    status: 'Pending',
-    priority: 'Low',
-    dueDate: '2024-12-15',
-    tags: ['maintenance'],
-  },
-  {
-    title: 'Create error handling module',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: '2024-12-21',
-    tags: ['backend', 'error-handling'],
-  },
-  {
-    title: 'Design onboarding flow',
-    status: 'Pending',
-    priority: 'High',
-    dueDate: '2024-12-24',
-    tags: ['UI', 'UX'],
-  },
-  {
-    title: 'Conduct code review',
-    status: 'Completed',
-    priority: 'Low',
-    dueDate: '2024-12-05',
-    tags: ['team'],
-  },
-  {
-    title: 'Set up analytics tracking',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: '2024-12-27',
-    tags: ['analytics', 'backend'],
-  },
-  {
-    title: 'Research AI tools',
-    status: 'Pending',
-    priority: 'High',
-    dueDate: '2024-12-29',
-    tags: ['research'],
-  },
-  {
-    title: 'Fix 404 errors',
-    status: 'Completed',
-    priority: 'Low',
-    dueDate: '2024-12-13',
-    tags: ['bug', 'frontend'],
-  },
-  {
-    title: 'Improve SEO',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: '2024-12-26',
-    tags: ['SEO', 'frontend'],
-  },
-  {
-    title: 'Deploy staging server',
-    status: 'Pending',
-    priority: 'High',
-    dueDate: '2024-12-23',
-    tags: ['devops', 'staging'],
-  },
-  {
-    title: 'Organize team retrospective',
-    status: 'Completed',
-    priority: 'Low',
-    dueDate: '2024-12-11',
-    tags: ['team', 'management'],
-  },
-  {
-    title: 'Implement dark mode',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: '2024-12-17',
-    tags: ['frontend', 'UI'],
-  },
-];
+enum taskEvents {
+  generalTask = 'generalTask',
+  confirmation = 'confirmation',
+}
 
 @Component({
   selector: 'app-table',
   imports: [
+    CommonModule,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
     DinamicFormFieldComponent,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    GeneralModalComponent,
+    TasksGeneralFormComponent,
+    ConfirmComponent,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
-export class TableComponent {
+export class TableComponent implements AfterViewInit, OnInit {
   titleFilter: string = '';
   statusPriorityFilter: string = '';
+  newTaskModalOpen: boolean = false;
+  confirmationModalOpen: boolean = false;
+  editModalOpen: boolean = false;
+  selectedTask!: Task;
+
+  tagList: string[] = ['tag 1', 'tag 2', 'tag 3', 'tag 4', 'tag 5'];
 
   displayedColumns: string[] = [
     'title',
@@ -182,14 +58,48 @@ export class TableComponent {
     'tags',
     'actions',
   ];
-  dataSource = new MatTableDataSource<Task>(TASK_DATA);
+
+  dataSource = new MatTableDataSource<Task>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  taskService = inject(TasksService);
+
+  ngOnInit(): void {
+    this.taskService.getTasks().subscribe((tasks) => {
+      this.dataSource.data = tasks;
+    });
+  }
+
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+  }
+
+  openNewTaskModal() {
+    this.newTaskModalOpen = true;
+  }
+
+  openEditTaskModal(task: Task) {
+    this.editModalOpen = true;
+    this.selectedTask = task;
+  }
+
+  openDeleteTaskModal(task: Task) {
+    this.confirmationModalOpen = true;
+    this.selectedTask = task;
+  }
+
+  closeModal(Section: 'generalTask' | 'confirmation') {
+    if (Section === 'generalTask') {
+      this.newTaskModalOpen = false;
+      this.editModalOpen = false;
+      this.selectedTask = {} as Task;
+    } else if (Section === 'confirmation') {
+      this.confirmationModalOpen = false;
+      this.selectedTask = {} as Task;
+    }
   }
 
   handleInputEvent(field: 'statusPriority' | 'title', value: string) {
@@ -233,11 +143,33 @@ export class TableComponent {
     this.dataSource.filter = '';
   }
 
-  editTask(task: Task) {
-    console.log(task);
+  onCreateTask(task: Task) {
+    this.taskService.createTask(task).subscribe((taskResponse) => {
+      this.dataSource.data = [...this.dataSource.data, taskResponse.newTask];
+      this.closeModal(taskEvents.generalTask);
+    });
   }
 
-  deleteTask(task: Task) {
-    console.log(task);
+  editTask(task: Task) {
+    this.taskService.updateTask(this.selectedTask._id, task).subscribe(() => {
+      this.dataSource.data = this.dataSource.data.map((taskItem) => {
+        if (taskItem._id === this.selectedTask._id) {
+          return task;
+        }
+        return taskItem;
+      });
+      this.closeModal(taskEvents.generalTask);
+    });
+  }
+
+  deleteTask(response: boolean) {
+    if (response) {
+      this.taskService.deleteTask(this.selectedTask._id).subscribe(() => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (task) => task._id !== this.selectedTask._id
+        );
+        this.closeModal(taskEvents.confirmation);
+      });
+    }
   }
 }

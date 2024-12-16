@@ -1,0 +1,9 @@
+<div class="w-[40rem] h-[20rem] bg-white shadow-xl p-8 rounded-lg border-[1px] border-neutral-50 flex justify-evenly flex-col gap-8">
+  <p class="w-full text-4xl text-center">Are you sure?</p>
+  <p class="w-full text-lg text-center text-gray-400">Do you realy want to delete this task? This process cannot be
+    undone.</p>
+  <div class="w-full flex justify-center gap-12">
+    <button mat-flat-button class="cancel-button" (click)="onCancel()">Cancel</button>
+    <button mat-flat-button (click)="onConfirm()">Confirm</button>
+  </div>
+</div>
