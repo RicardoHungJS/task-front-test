@@ -1,6 +1,8 @@
-button {
-  width: 12rem;
-  font-size: 1.3rem;
+@media screen and (min-width: 770px) {
+  button {
+    width: 12rem;
+    font-size: 1.3rem;
+  }
 }
 
 .cancel-button {

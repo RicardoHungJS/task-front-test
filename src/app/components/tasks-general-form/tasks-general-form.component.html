@@ -1,15 +1,15 @@
 <div
-  class="w-[60rem] h-[45rem] flex flex-col justify-between bg-white shadow-xl p-8 rounded-lg border-[1px] border-neutral-50">
+  class="w-[90dvw] md:w-[60rem] h-[70dvh] md:h-[45rem] flex flex-col justify-between bg-white shadow-xl p-8 rounded-lg border-[1px] border-neutral-50">
   <p class="w-full text-4xl text-center">{{formTitle}}</p>
-  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="w-full flex flex-wrap gap-8 px-10">
-    <div class="w-full h-20 flex justify-between gap-8">
-      <mat-form-field class="w-96">
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="w-full flex flex-wrap gap-4 md:gap-8 px-10 overflow-auto md:overflow-hidden py-12 md:py-0">
+    <div class="w-full md:h-20 flex justify-between md:gap-8 flex-wrap md:flex-nowrap">
+      <mat-form-field class="w-full md:w-96">
         <mat-label>Title</mat-label>
         <input matInput formControlName="title">
         <mat-error *ngIf="taskForm.get('title')?.hasError('required')">Title is required</mat-error>
       </mat-form-field>
 
-      <mat-form-field class="w-96">
+      <mat-form-field class="w-full md:w-96">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           <mat-option *ngFor="let status of statuses" [value]="status.value">{{status.viewValue}}</mat-option>
@@ -18,8 +18,8 @@
       </mat-form-field>
     </div>
 
-    <div class="w-full h-20 flex justify-between gap-8">
-      <mat-form-field class="w-96">
+    <div class="w-full md:h-20 flex justify-between md:gap-8 flex-wrap md:flex-nowrap">
+      <mat-form-field class="w-full md:w-96">
         <mat-label>Priority</mat-label>
         <mat-select formControlName="priority">
           <mat-option *ngFor="let priority of priorities" [value]="priority.value">{{priority.viewValue}}</mat-option>
@@ -27,7 +27,7 @@
         <mat-error *ngIf="taskForm.get('priority')?.hasError('required')">Priority is required</mat-error>
       </mat-form-field>
 
-      <mat-form-field class="w-96">
+      <mat-form-field class="w-full md:w-96">
         <mat-label>DueDate</mat-label>
         <input matInput [matDatepicker]="picker" formControlName="dueDate">
         <mat-hint>MM/DD/YYYY</mat-hint>
@@ -37,8 +37,8 @@
       </mat-form-field>
     </div>
 
-    <div class="w-full h-20 flex justify-between gap-8">
-      <mat-form-field class="w-96">
+    <div class="w-full md:h-20 flex justify-between md:gap-8 flex-wrap md:flex-nowrap">
+      <mat-form-field class="w-full md:w-96">
         <mat-label>Tags</mat-label>
         <mat-select formControlName="tags" multiple>
           <mat-option *ngFor="let tag of tagOptions" [value]="tag">{{tag}}</mat-option>
@@ -46,14 +46,14 @@
         <mat-error *ngIf="taskForm.get('tags')?.hasError('required')">At least one tag is required</mat-error>
       </mat-form-field>
 
-      <mat-form-field class="w-96">
+      <mat-form-field class="w-full md:w-96">
         <mat-label>Description</mat-label>
         <textarea matInput formControlName="description"></textarea>
         <mat-error *ngIf="taskForm.get('description')?.hasError('required')">Description is required</mat-error>
       </mat-form-field>
     </div>
 
-    <div class="flex justify-center w-full gap-12 mt-20">
+    <div class="flex justify-center w-full gap-4 md:gap-12 md:mt-20">
       <button mat-flat-button [ngClass]="'cancel-button form-button'" (click)="onCancel()">Cancel</button>
       <button mat-flat-button [ngClass]="'form-button'" type="submit">{{taskEvent === 'create' ? 'Add Event' : 'Update
         Event'}}</button>
