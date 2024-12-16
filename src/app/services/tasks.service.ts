@@ -7,8 +7,8 @@ import { Task, TaskBackResponse } from '../models/taskModel';
   providedIn: 'root',
 })
 export class TasksService {
-  // private apiUrl = 'https://express-tasks-back.vercel.app/api/v1/task';
-  private apiUrl = 'http://localhost:3000/api/v1/task';
+  private apiUrl = 'https://express-tasks-back.vercel.app/api/v1/task';
+  // private apiUrl = 'http://localhost:3000/api/v1/task';
 
   constructor(private http: HttpClient) {}
 
