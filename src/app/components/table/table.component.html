@@ -8,15 +8,14 @@
   </app-dinamic-form-field>
 
   <div class="h-full flex items-center gap-3">
-    @if (dataSource.filter === '') {
-    <button mat-flat-button disabled>Reset search fields</button>
-    } @else {
-    <button mat-flat-button (click)="ResetSearchFields()">Reset search fields</button>
-    }
-    <button mat-flat-button>Add new task</button>
+    <button mat-flat-button (click)="ResetSearchFields()" [disabled]="dataSource.filter === ''">Reset search
+      fields</button>
+    <button mat-flat-button (click)="openNewTaskModal()">Add new task
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
 </div>
-<div class="w-3/4 mx-auto max-h-[60vh] overflow-auto">
+<div class="w-3/4 mx-auto max-h-[60vh] overflow-auto border-b">
   <table mat-table matSort [dataSource]="dataSource">
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
@@ -35,7 +34,7 @@
 
     <ng-container matColumnDef="dueDate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> DueDate </th>
-      <td mat-cell *matCellDef="let element"> {{element.dueDate}} </td>
+      <td mat-cell *matCellDef="let element"> {{element.dueDate | date:'MM/dd/YYYY'}} </td>
     </ng-container>
 
     <ng-container matColumnDef="tags">
@@ -45,11 +44,11 @@
 
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Actions </th>
-      <td mat-cell *matCellDef="let element" class="flex gap-4 h-16 items-center">
-        <button mat-icon-button (click)="editTask(element)">
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="openEditTaskModal(element)" class="mr-2">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button (click)="deleteTask(element)">
+        <button mat-icon-button (click)="openDeleteTaskModal(element)">
           <mat-icon>delete</mat-icon>
         </button>
       </td>
@@ -58,6 +57,27 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-
-  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
 </div>
+
+<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"
+  class="w-3/4 mx-auto shadow-top"></mat-paginator>
+
+@if (newTaskModalOpen) {
+<app-general-modal (closeEvent)="closeModal('generalTask')">
+  <app-tasks-general-form formTitle="Add a new task" [tagOptions]="tagList" (submitData)="onCreateTask($event)"
+    (closeForm)="closeModal('generalTask')"></app-tasks-general-form>
+</app-general-modal>
+}
+
+@if (editModalOpen) {
+<app-general-modal (closeEvent)="closeModal('generalTask')">
+  <app-tasks-general-form formTitle="Add a new task" [tagOptions]="tagList" (submitData)="editTask($event)"
+    (closeForm)="closeModal('generalTask')" [task]="selectedTask" taskEvent="update"></app-tasks-general-form>
+</app-general-modal>
+}
+
+@if (confirmationModalOpen) {
+<app-general-modal (closeEvent)="closeModal('confirmation')">
+  <app-confirm (confirm)="deleteTask($event)"></app-confirm>
+</app-general-modal>
+}
